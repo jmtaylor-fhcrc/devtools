@@ -47,7 +47,7 @@
 install <-
   function(pkg = ".", reload = TRUE, quick = FALSE, build = !quick,
              args = getOption("devtools.install.args"), quiet = FALSE,
-             dependencies = NA, upgrade = "ask",
+             dependencies = NA, upgrade = "never",
              build_vignettes = FALSE,
              keep_source = getOption("keep.source.pkgs"),
              force = FALSE,
@@ -83,13 +83,13 @@ install <-
     )
 
     if (build) {
-      install_path <- pkgbuild::build(pkg$path, dest_path = tempdir(), args = build_opts, quiet = quiet)
+      install_path <- pkgbuild::build(pkg$path, dest_path = tempdir(), args = build_opts, quiet = quiet, vignettes = build_vignettes)
       on.exit(unlink(install_path), add = TRUE)
     } else {
       install_path <- pkg$path
     }
 
-    callr::rcmd("INSTALL", c(install_path, opts), echo = !quiet, show = !quiet)
+    install.packages(install_path, configure.args = opts)
 
     if (reload) {
       reload(pkg, quiet = quiet)
